@@ -26,10 +26,11 @@ func ecdsaPrivateToJWK(privateKey *ecdsa.PrivateKey) map[string]string {
 
 	return map[string]string{
 		"kty": "EC",
-		"crv": "P-521",
-		"x":   base64UrlEncode(append(make([]byte, 66-len(xBytes)), xBytes...)),
-		"y":   base64UrlEncode(append(make([]byte, 66-len(yBytes)), yBytes...)),
-		"d":   base64UrlEncode(append(make([]byte, 66-len(dBytes)), dBytes...)),
+		"crv": "P-256",
+		"use": "sig",
+		"x":   base64UrlEncode(append(make([]byte, 32-len(xBytes)), xBytes...)), // Adjusted for 256-bit length
+		"y":   base64UrlEncode(append(make([]byte, 32-len(yBytes)), yBytes...)), // Adjusted for 256-bit length
+		"d":   base64UrlEncode(append(make([]byte, 32-len(dBytes)), dBytes...)), // Adjusted for 256-bit length
 	}
 }
 
@@ -40,9 +41,10 @@ func ecdsaPublicToJWK(pub *ecdsa.PublicKey) map[string]string {
 
 	return map[string]string{
 		"kty": "EC",
-		"crv": "P-521",
-		"x":   base64UrlEncode(append(make([]byte, 66-len(xBytes)), xBytes...)),
-		"y":   base64UrlEncode(append(make([]byte, 66-len(yBytes)), yBytes...)),
+		"crv": "P-256",
+		"use": "sig",
+		"x":   base64UrlEncode(append(make([]byte, 32-len(xBytes)), xBytes...)), // Adjusted for 256-bit length
+		"y":   base64UrlEncode(append(make([]byte, 32-len(yBytes)), yBytes...)), // Adjusted for 256-bit length
 	}
 }
 
@@ -55,9 +57,9 @@ func runOpenSSLCommand(command string, args ...string) error {
 }
 
 func main() {
-	// Step 1: Generate private_key.pem
+	// Step 1: Generate private_key.pem with prime256v1 curve
 	fmt.Println("Generating private_key.pem...")
-	err := runOpenSSLCommand("openssl", "ecparam", "-name", "secp521r1", "-genkey", "-noout", "-out", "private_key.pem")
+	err := runOpenSSLCommand("openssl", "ecparam", "-name", "prime256v1", "-genkey", "-noout", "-out", "private_key.pem")
 	if err != nil {
 		log.Fatalf("Error generating private key: %v", err)
 	}
